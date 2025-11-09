@@ -1,3 +1,4 @@
+
 // THIS FILE REPRESENTS THE FRONTEND'S API CLIENT
 // It acts as a bridge between the UI components and the simulated backend server.
 
@@ -54,4 +55,14 @@ export const getReviews = async (): Promise<Review[]> => {
 export const getNews = async (): Promise<NewsArticle[]> => {
   await networkDelay(500);
   return server.handleGetNewsRequest();
+};
+
+export const addFavorite = async (userId: number, gameId: number): Promise<UserProfile> => {
+    await networkDelay(300);
+    return server.handleAddFavoriteRequest(userId, gameId);
+};
+
+export const removeFavorite = async (userId: number, gameId: number): Promise<UserProfile> => {
+    await networkDelay(300);
+    return server.handleRemoveFavoriteRequest(userId, gameId);
 };

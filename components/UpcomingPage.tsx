@@ -2,10 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import PageHeader from './PageHeader';
 import GameCard from './GameCard';
-import type { GameArticle } from '../types';
+import type { GameArticle, UserProfile } from '../types';
 import * as api from '../api';
 
-const UpcomingPage: React.FC = () => {
+// FIX: Add props to allow user interaction
+interface UpcomingPageProps {
+  user: UserProfile | null;
+  onUserUpdate: (updatedUser: UserProfile) => void;
+}
+
+const UpcomingPage: React.FC<UpcomingPageProps> = ({ user, onUserUpdate }) => {
   const [upcomingGames, setUpcomingGames] = useState<GameArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +32,20 @@ const UpcomingPage: React.FC = () => {
     fetchUpcoming();
   }, []);
 
+  // FIX: Add handler for toggling favorites, consistent with other pages
+  const handleToggleFavorite = async (gameId: number) => {
+    if (!user) return;
+    try {
+      const isCurrentlyFavorite = user.favoriteGameIds.includes(gameId);
+      const updatedUser = isCurrentlyFavorite
+        ? await api.removeFavorite(user.id, gameId)
+        : await api.addFavorite(user.id, gameId);
+      onUserUpdate(updatedUser);
+    } catch (error) {
+      console.error("Failed to toggle favorite", error);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <PageHeader
@@ -37,7 +57,13 @@ const UpcomingPage: React.FC = () => {
       {!loading && !error && upcomingGames.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {upcomingGames.map((article: GameArticle) => (
-            <GameCard key={article.id} article={article} />
+            // FIX: Pass required props to GameCard
+            <GameCard 
+              key={article.id} 
+              article={article} 
+              user={user}
+              onToggleFavorite={handleToggleFavorite}
+            />
           ))}
         </div>
       ) : (

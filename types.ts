@@ -42,6 +42,7 @@ export interface BaseUser {
 // A composite type for the profile page, including "joined" data
 export interface UserProfile extends BaseUser {
   favoriteGames: GameArticle[];
+  favoriteGameIds: number[]; // Added for efficient favorite checking
   stats: {
     reviews: number;
     posts: number; // This remains a mock value as no 'posts' table was provided

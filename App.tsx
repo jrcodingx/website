@@ -38,18 +38,6 @@ const App: React.FC = () => {
     setCurrentPage('home'); // Redirect to home on logout
   };
   
-  const handleUpdateUser = async (updatedData: UserProfile) => {
-    if (user) {
-      try {
-        const updatedUser = await api.updateUserProfile(updatedData);
-        setUser(updatedUser);
-      } catch (error) {
-        console.error("Failed to update user", error);
-        // Optionally show an error message to the user
-      }
-    }
-  };
-
   const handleOpenLogin = () => {
     setShowLogin(true);
   };
@@ -85,16 +73,18 @@ const App: React.FC = () => {
       case 'reviews':
         return <ReviewsPage />;
       case 'upcoming':
-        return <UpcomingPage />;
+        // FIX: Pass user and setUser to UpcomingPage
+        return <UpcomingPage user={user} onUserUpdate={setUser} />;
       case 'community':
         return <CommunityPage />;
       case 'recommendation':
         return <RecommendationPage />;
       case 'profile':
-        return user ? <ProfilePage user={user} onUpdateUser={handleUpdateUser} /> : null;
+        // FIX: Pass setUser as onUserUpdate to ProfilePage
+        return user ? <ProfilePage user={user} onUserUpdate={setUser} /> : null;
       case 'home':
       default:
-        return <HomePage />;
+        return <HomePage user={user} onUserUpdate={setUser} />;
     }
   };
 

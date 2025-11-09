@@ -156,6 +156,13 @@ export const MOCK_USER: UserProfile = {
     MOCK_GAME_ARTICLES[6],
     MOCK_GAME_ARTICLES[3],
   ],
+  // FIX: Added missing favoriteGameIds property
+  favoriteGameIds: [
+    MOCK_GAME_ARTICLES[0].id,
+    MOCK_GAME_ARTICLES[2].id,
+    MOCK_GAME_ARTICLES[6].id,
+    MOCK_GAME_ARTICLES[3].id,
+  ],
   stats: {
     reviews: 12,
     posts: 47,

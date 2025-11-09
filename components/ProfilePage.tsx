@@ -6,19 +6,45 @@ import PageHeader from './PageHeader';
 import type { UserProfile } from '../types';
 import EditProfileModal from './EditProfileModal';
 import PencilIcon from './icons/PencilIcon';
+import * as api from '../api';
 
 interface ProfilePageProps {
     user: UserProfile;
-    onUpdateUser: (updatedUser: UserProfile) => void;
+    onUserUpdate: (updatedUser: UserProfile) => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUserUpdate }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Guard against user being null, though App.tsx should prevent this.
   if (!user) {
     return null; 
   }
+
+  // FIX: Handle toggling favorite status for games
+  const handleToggleFavorite = async (gameId: number) => {
+    try {
+      const isCurrentlyFavorite = user.favoriteGameIds.includes(gameId);
+      const updatedUser = isCurrentlyFavorite
+        ? await api.removeFavorite(user.id, gameId)
+        : await api.addFavorite(user.id, gameId);
+      onUserUpdate(updatedUser);
+    } catch (error) {
+      console.error("Failed to toggle favorite", error);
+      // Optionally show an error to the user
+    }
+  };
+  
+  // FIX: Handle saving profile edits locally
+  const handleProfileSave = async (updatedData: UserProfile) => {
+      try {
+        const updatedUser = await api.updateUserProfile(updatedData);
+        onUserUpdate(updatedUser);
+      } catch (error) {
+        console.error("Failed to update user", error);
+        // Optionally show an error message to the user
+      }
+  };
 
   return (
     <>
@@ -73,7 +99,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser }) => {
             {user.favoriteGames.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {user.favoriteGames.map((game) => (
-                  <GameCard key={game.id} article={game} />
+                  // FIX: Pass required props to GameCard
+                  <GameCard 
+                    key={game.id} 
+                    article={game} 
+                    user={user}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
                 ))}
               </div>
             ) : (
@@ -89,7 +121,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser }) => {
             user={user} 
             onClose={() => setIsEditModalOpen(false)}
             onSave={(updatedUser) => {
-                onUpdateUser(updatedUser);
+                handleProfileSave(updatedUser);
                 setIsEditModalOpen(false);
             }}
         />

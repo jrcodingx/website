@@ -1,3 +1,4 @@
+
 // THIS FILE REPRESENTS THE SIMULATED BACKEND SERVER
 // It handles all data logic and persistence.
 
@@ -203,6 +204,7 @@ export function handleGetUserProfileRequest(userId: number): UserProfile {
   return {
     ...mapDbUserToBaseUser(user),
     favoriteGames,
+    favoriteGameIds,
     stats: {
       reviews: reviewsCount,
       posts: postsCount,
@@ -257,4 +259,24 @@ export function handleGetReviewsRequest(): Review[] {
 
 export function handleGetNewsRequest(): NewsArticle[] {
   return [...db.news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+export function handleAddFavoriteRequest(userId: number, gameId: number): UserProfile {
+    const isAlreadyFavorite = db.user_favorite_games.some(f => f.user_id === userId && f.game_id === gameId);
+    if (!isAlreadyFavorite) {
+        db.user_favorite_games.push({ user_id: userId, game_id: gameId });
+        saveDb();
+        console.log(`SERVER: User ${userId} favorited game ${gameId}`);
+    }
+    return handleGetUserProfileRequest(userId);
+}
+
+export function handleRemoveFavoriteRequest(userId: number, gameId: number): UserProfile {
+    const initialCount = db.user_favorite_games.length;
+    db.user_favorite_games = db.user_favorite_games.filter(f => !(f.user_id === userId && f.game_id === gameId));
+    if (db.user_favorite_games.length < initialCount) {
+        saveDb();
+        console.log(`SERVER: User ${userId} unfavorited game ${gameId}`);
+    }
+    return handleGetUserProfileRequest(userId);
 }
