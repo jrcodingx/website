@@ -1,28 +1,50 @@
 
 import React from 'react';
 import UserIcon from './icons/UserIcon';
+import type { Page } from '../App';
 
 interface HeaderProps {
   isLoggedIn: boolean;
   onLoginClick: () => void;
   onLogout: () => void;
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout }) => {
+const NavLink: React.FC<{
+  page: Page;
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
+  children: React.ReactNode;
+}> = ({ page, currentPage, onNavigate, children }) => {
+  const isActive = currentPage === page;
+  return (
+    <button
+      onClick={() => onNavigate(page)}
+      className={`transition-colors duration-200 ${
+        isActive ? 'text-white font-semibold' : 'text-text-secondary hover:text-white'
+      }`}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, currentPage, onNavigate }) => {
   return (
     <header className="bg-surface/80 backdrop-blur-sm sticky top-0 z-50 shadow-lg shadow-black/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <a href="#" className="text-2xl font-black text-white tracking-wider">
+            <button onClick={() => onNavigate('home')} className="text-2xl font-black text-white tracking-wider">
               <span className="text-primary">GAME</span>HUB
-            </a>
+            </button>
           </div>
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-text-secondary hover:text-white transition-colors duration-200">News</a>
-            <a href="#" className="text-text-secondary hover:text-white transition-colors duration-200">Reviews</a>
-            <a href="#" className="text-text-secondary hover:text-white transition-colors duration-200">Upcoming</a>
-            <a href="#" className="text-text-secondary hover:text-white transition-colors duration-200">Community</a>
+            <NavLink page="news" currentPage={currentPage} onNavigate={onNavigate}>News</NavLink>
+            <NavLink page="reviews" currentPage={currentPage} onNavigate={onNavigate}>Reviews</NavLink>
+            <NavLink page="upcoming" currentPage={currentPage} onNavigate={onNavigate}>Upcoming</NavLink>
+            <NavLink page="community" currentPage={currentPage} onNavigate={onNavigate}>Community</NavLink>
           </nav>
           <div className="flex items-center">
             {isLoggedIn ? (
@@ -54,4 +76,3 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout }) =
 };
 
 export default Header;
-   

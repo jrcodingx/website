@@ -1,5 +1,5 @@
 
-import type { GameArticle } from './types';
+import type { GameArticle, NewsArticle, Review } from './types';
 
 export const MOCK_GAME_ARTICLES: GameArticle[] = [
   {
@@ -67,4 +67,77 @@ export const MOCK_GAME_ARTICLES: GameArticle[] = [
     releaseDate: '2025-02-14',
   }
 ];
-   
+
+export const MOCK_NEWS_ARTICLES: NewsArticle[] = [
+  {
+    id: 1,
+    title: 'Cybernetic Horizon Patch 1.5 Details Revealed',
+    excerpt: 'The developers have announced a massive new content update, including new story chapters, weapons, and a complete overhaul of the cybernetics system.',
+    imageUrl: 'https://picsum.photos/seed/news1/600/400',
+    author: 'Jane Doe',
+    date: '2024-08-15',
+    category: 'Update',
+  },
+  {
+    id: 2,
+    title: 'Project Chimera World Championship Announced',
+    excerpt: 'The first official global tournament for Project Chimera kicks off next month with a $1 million prize pool. Qualifiers are open now!',
+    imageUrl: 'https://picsum.photos/seed/news2/600/400',
+    author: 'John Smith',
+    date: '2024-08-12',
+    category: 'Esports',
+  },
+  {
+    id: 3,
+    title: 'Indie Darling "Pixel Odyssey" Gets a Surprise Sequel',
+    excerpt: 'The beloved platformer is getting a follow-up, "Pixel Odyssey 2: The Crystal Caverns", slated for a Q2 2025 release.',
+    imageUrl: 'https://picsum.photos/seed/news3/600/400',
+    author: 'Emily White',
+    date: '2024-08-10',
+    category: 'Announcement',
+  },
+    {
+    id: 4,
+    title: 'Speed Demons IV: First DLC Cars Leaked',
+    excerpt: 'Images of three new hypercars have surfaced online, hinting at the first major content drop for the popular racing game.',
+    imageUrl: 'https://picsum.photos/seed/news4/600/400',
+    author: 'Chris Green',
+    date: '2024-08-05',
+    category: 'Update',
+  },
+];
+
+export const MOCK_REVIEWS: Review[] = [
+  {
+    id: 1,
+    gameTitle: 'Cybernetic Horizon',
+    imageUrl: 'https://picsum.photos/seed/game1/600/400',
+    score: 9.2,
+    rating: 5,
+    summary: 'A masterpiece of the RPG genre. Its world is breathtakingly immersive, and the storytelling is second to none. A must-play.',
+  },
+  {
+    id: 2,
+    gameTitle: 'Echoes of the Void',
+    imageUrl: 'https://picsum.photos/seed/game3/600/400',
+    score: 8.5,
+    rating: 4,
+    summary: 'A beautifully crafted puzzle game with a haunting atmosphere. While some puzzles are obtuse, the experience is incredibly rewarding.',
+  },
+  {
+    id: 3,
+    gameTitle: 'Project Chimera: Uprising',
+    imageUrl: 'https://picsum.photos/seed/game2/600/400',
+    score: 8.8,
+    rating: 4,
+    summary: 'Offers tight, tactical gunplay that rewards teamwork and strategy. A few balance issues hold it back from perfection.',
+  },
+  {
+    id: 4,
+    gameTitle: 'Pixel Odyssey',
+    imageUrl: 'https://picsum.photos/seed/game7/600/400',
+    score: 9.0,
+    rating: 5,
+    summary: 'Perfectly blends retro charm with modern design. The controls are flawless, and the level design is consistently inventive.',
+  }
+];
