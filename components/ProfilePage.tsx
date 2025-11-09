@@ -15,6 +15,11 @@ interface ProfilePageProps {
 const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Guard against user being null, though App.tsx should prevent this.
+  if (!user) {
+    return null; 
+  }
+
   return (
     <>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

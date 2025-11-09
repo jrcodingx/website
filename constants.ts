@@ -143,6 +143,8 @@ export const MOCK_REVIEWS: Review[] = [
 ];
 
 export const MOCK_USER: User = {
+  id: 1,
+  email: 'gamerpro123@example.com',
   username: 'GamerPro123',
   avatarUrl: 'https://picsum.photos/seed/avatar/200/200',
   joinDate: '2023-05-18',

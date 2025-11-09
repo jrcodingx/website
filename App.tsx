@@ -10,28 +10,37 @@ import UpcomingPage from './components/UpcomingPage';
 import CommunityPage from './components/CommunityPage';
 import ProfilePage from './components/ProfilePage';
 import type { User } from './types';
-import { MOCK_USER } from './constants';
+import * as api from './api';
 
 export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'profile';
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [user, setUser] = useState<User>(MOCK_USER);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const isLoggedIn = !!user;
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
     setShowLogin(false);
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    setUser(null);
     setCurrentPage('home'); // Redirect to home on logout
   };
   
-  const handleUpdateUser = (updatedUser: User) => {
-    setUser(updatedUser);
+  const handleUpdateUser = async (updatedData: User) => {
+    if (user) {
+      try {
+        const updatedUser = await api.updateUser(updatedData);
+        setUser(updatedUser);
+      } catch (error) {
+        console.error("Failed to update user", error);
+        // Optionally show an error message to the user
+      }
+    }
   };
 
   const handleOpenLogin = () => {
@@ -73,7 +82,7 @@ const App: React.FC = () => {
       case 'community':
         return <CommunityPage />;
       case 'profile':
-        return <ProfilePage user={user} onUpdateUser={handleUpdateUser} />;
+        return user ? <ProfilePage user={user} onUpdateUser={handleUpdateUser} /> : null;
       case 'home':
       default:
         return <HomePage />;
@@ -88,7 +97,7 @@ const App: React.FC = () => {
         onLogout={handleLogout}
         currentPage={currentPage}
         onNavigate={navigate}
-        username={user.username}
+        username={user?.username || ''}
       />
       <main className="flex-grow">
         {renderPage()}
