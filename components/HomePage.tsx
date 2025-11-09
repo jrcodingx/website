@@ -1,12 +1,56 @@
 
-import React from 'react';
-import { MOCK_GAME_ARTICLES } from '../constants';
+import React, { useState, useEffect } from 'react';
 import GameCard from './GameCard';
 import type { GameArticle } from '../types';
+import * as api from '../api';
 
 const HomePage: React.FC = () => {
-  const featuredGame = MOCK_GAME_ARTICLES[0];
-  const otherGames = MOCK_GAME_ARTICLES.slice(1);
+  const [games, setGames] = useState<GameArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        setLoading(true);
+        const allGames = await api.getGames();
+        setGames(allGames);
+      } catch (err) {
+        setError('Failed to load games. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGames();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center h-[50vh] flex items-center justify-center">
+        <p className="text-text-secondary text-xl">Loading awesome games...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center h-[50vh] flex items-center justify-center">
+        <p className="text-red-400 text-xl">{error}</p>
+      </div>
+    );
+  }
+
+  const featuredGame = games[0];
+  const otherGames = games.slice(1);
+
+  if (!featuredGame) {
+    return (
+       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center h-[50vh] flex items-center justify-center">
+        <p className="text-text-secondary text-xl">No games found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -23,9 +67,9 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Latest News Section */}
+      {/* Latest Updates Section */}
       <section>
-        <h2 className="text-3xl font-bold mb-6 text-white border-l-4 border-primary pl-4">Latest Updates</h2>
+        <h2 className="text-3xl font-bold mb-6 text-white border-l-4 border-primary pl-4">Discover Games</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {otherGames.map((article: GameArticle) => (
             <GameCard key={article.id} article={article} />
@@ -37,4 +81,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-   

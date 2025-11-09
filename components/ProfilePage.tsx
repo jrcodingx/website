@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import GameCard from './GameCard';
 import CalendarIcon from './icons/CalendarIcon';
 import PageHeader from './PageHeader';
-import type { User } from '../types';
+import type { UserProfile } from '../types';
 import EditProfileModal from './EditProfileModal';
 import PencilIcon from './icons/PencilIcon';
 
 interface ProfilePageProps {
-    user: User;
-    onUpdateUser: (updatedUser: User) => void;
+    user: UserProfile;
+    onUpdateUser: (updatedUser: UserProfile) => void;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser }) => {

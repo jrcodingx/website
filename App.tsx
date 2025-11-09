@@ -10,21 +10,27 @@ import UpcomingPage from './components/UpcomingPage';
 import CommunityPage from './components/CommunityPage';
 import ProfilePage from './components/ProfilePage';
 import RecommendationPage from './components/RecommendationPage';
-import type { User } from './types';
+import type { UserProfile, BaseUser } from './types';
 import * as api from './api';
 
 export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'recommendation' | 'profile';
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
 
   const isLoggedIn = !!user;
 
-  const handleLogin = (loggedInUser: User) => {
-    setUser(loggedInUser);
-    setShowLogin(false);
+  const handleLogin = async (loggedInUser: BaseUser) => {
+    try {
+        const userProfile = await api.getUserProfile(loggedInUser.id);
+        setUser(userProfile);
+        setShowLogin(false);
+    } catch (error) {
+        console.error("Failed to fetch user profile", error);
+        // Optionally show an error message to the user
+    }
   };
 
   const handleLogout = () => {
@@ -32,10 +38,10 @@ const App: React.FC = () => {
     setCurrentPage('home'); // Redirect to home on logout
   };
   
-  const handleUpdateUser = async (updatedData: User) => {
+  const handleUpdateUser = async (updatedData: UserProfile) => {
     if (user) {
       try {
-        const updatedUser = await api.updateUser(updatedData);
+        const updatedUser = await api.updateUserProfile(updatedData);
         setUser(updatedUser);
       } catch (error) {
         console.error("Failed to update user", error);

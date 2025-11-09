@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import CloseIcon from './icons/CloseIcon';
-import type { User } from '../types';
+import type { UserProfile } from '../types';
 
 interface EditProfileModalProps {
-  user: User;
+  user: UserProfile;
   onClose: () => void;
-  onSave: (updatedUser: User) => void;
+  onSave: (updatedUser: UserProfile) => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSave }) => {

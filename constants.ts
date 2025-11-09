@@ -1,5 +1,5 @@
 
-import type { GameArticle, NewsArticle, Review, User } from './types';
+import type { GameArticle, NewsArticle, Review, UserProfile } from './types';
 
 export const MOCK_GAME_ARTICLES: GameArticle[] = [
   {
@@ -142,7 +142,8 @@ export const MOCK_REVIEWS: Review[] = [
   }
 ];
 
-export const MOCK_USER: User = {
+// FIX: Changed type from 'User' to 'UserProfile' to match the imported type.
+export const MOCK_USER: UserProfile = {
   id: 1,
   email: 'gamerpro123@example.com',
   username: 'GamerPro123',

@@ -1,8 +1,8 @@
 
-import React from 'react';
-import { MOCK_NEWS_ARTICLES } from '../constants';
+import React, { useState, useEffect } from 'react';
 import PageHeader from './PageHeader';
 import type { NewsArticle } from '../types';
+import * as api from '../api';
 
 const NewsCard: React.FC<{ article: NewsArticle }> = ({ article }) => (
   <div className="bg-surface rounded-lg overflow-hidden shadow-lg hover:shadow-primary/30 transition-shadow duration-300 group transform hover:-translate-y-2">
@@ -27,17 +27,41 @@ const NewsCard: React.FC<{ article: NewsArticle }> = ({ article }) => (
 );
 
 const NewsPage: React.FC = () => {
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const allNews = await api.getNews();
+        setArticles(allNews);
+      } catch (err) {
+        setError('Failed to load news. Please try again later.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <PageHeader
         title="Game News & Updates"
         subtitle="Stay ahead of the curve with the latest happenings in the gaming world."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {MOCK_NEWS_ARTICLES.map((article) => (
-          <NewsCard key={article.id} article={article} />
-        ))}
-      </div>
+      {loading && <p className="text-center text-text-secondary">Loading news...</p>}
+      {error && <p className="text-center text-red-400">{error}</p>}
+      {!loading && !error && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {articles.map((article) => (
+            <NewsCard key={article.id} article={article} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

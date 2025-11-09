@@ -4,8 +4,9 @@ export interface GameArticle {
   title: string;
   description: string;
   imageUrl: string;
-  category: string;
-  releaseDate: string;
+  category: string; // genre
+  releaseDate: string; // from release_year
+  average_score?: number;
 }
 
 export interface NewsArticle {
@@ -18,26 +19,32 @@ export interface NewsArticle {
   category: 'Update' | 'Announcement' | 'Esports';
 }
 
+// Represents a review with joined game data for UI
 export interface Review {
   id: number;
   gameTitle: string;
   imageUrl: string;
-  score: number; // e.g. 9.5
-  rating: number; // stars 1-5
+  score: number;
+  rating: number; // Will be derived from score
   summary: string;
 }
 
-export interface User {
+// Corresponds to the core fields of the `users` table
+export interface BaseUser {
   id: number;
   email: string;
   username: string;
   avatarUrl: string;
-  joinDate: string;
+  joinDate: string; // from created_at
   bio?: string;
+}
+
+// A composite type for the profile page, including "joined" data
+export interface UserProfile extends BaseUser {
   favoriteGames: GameArticle[];
   stats: {
     reviews: number;
-    posts: number;
+    posts: number; // This remains a mock value as no 'posts' table was provided
   };
 }
 

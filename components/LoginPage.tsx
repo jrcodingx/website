@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import CloseIcon from './icons/CloseIcon';
 import * as api from '../api';
-import type { User } from '../types';
+import type { BaseUser } from '../types';
 
 interface LoginPageProps {
   onClose: () => void;
-  onLogin: (user: User) => void;
+  onLogin: (user: BaseUser) => void;
 }
 
 type FormMode = 'login' | 'signup';
@@ -26,7 +26,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose, onLogin }) => {
     setIsLoading(true);
 
     try {
-      let user: User;
+      let user: BaseUser;
       if (mode === 'login') {
         user = await api.login(email, password);
       } else {
