@@ -1,8 +1,8 @@
 import type { BaseUser, UserProfile, GameArticle, Review, NewsArticle } from './types';
 
-// --- SIMULATED DATABASE ---
+// --- SIMULATED DATABASE with localStorage Persistence ---
 // This simulates a database based on the provided schema.
-// In a real application, a backend server would manage this.
+// Data will now persist across page loads.
 
 // Corresponds to the `users` table
 interface DbUser {
@@ -46,8 +46,11 @@ interface DbUserFavoriteGame {
 }
 
 
-// --- SIMULATED DATA ---
-const db = {
+// --- DATA & STORAGE LOGIC ---
+const DB_STORAGE_KEY = 'gamehub_db';
+
+// The initial data if nothing is in storage
+const initialDb = {
   users: [
     {
       id: 1,
@@ -91,6 +94,31 @@ const db = {
   ] as NewsArticle[],
 };
 
+const loadDb = () => {
+  try {
+    const storedDb = localStorage.getItem(DB_STORAGE_KEY);
+    if (storedDb) {
+      console.log('API: Loaded database from localStorage.');
+      return JSON.parse(storedDb);
+    }
+  } catch (error) {
+    console.error('API: Could not parse database from localStorage.', error);
+  }
+  console.log('API: Initializing with default database.');
+  return JSON.parse(JSON.stringify(initialDb)); // Deep copy to prevent mutation issues
+};
+
+const saveDb = () => {
+  try {
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db));
+  } catch (error) {
+    console.error('API: Could not save database to localStorage.', error);
+  }
+};
+
+// Our live database object, loaded from storage
+let db = loadDb();
+
 // --- HELPER FUNCTIONS ---
 
 const networkDelay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -106,13 +134,9 @@ const mapDbUserToBaseUser = (dbUser: DbUser): BaseUser => ({
 
 const mapDbGameToGameArticle = (dbGame: DbGame): GameArticle => {
   let releaseDate = dbGame.release_year.toString();
-  // Simplified logic for "Coming Soon"
-  const isReleased = new Date().getFullYear() > dbGame.release_year;
-  if (!isReleased && dbGame.average_score === 0.0) {
-     const isThisYear = new Date().getFullYear() === dbGame.release_year;
-     if (!isThisYear) {
-        releaseDate = 'Coming Soon';
-     }
+  const currentYear = new Date().getFullYear();
+  if (dbGame.release_year > currentYear) {
+      releaseDate = 'Coming Soon';
   }
   
   return {
@@ -121,7 +145,7 @@ const mapDbGameToGameArticle = (dbGame: DbGame): GameArticle => {
     description: dbGame.description,
     imageUrl: dbGame.imageUrl,
     category: dbGame.genre,
-    releaseDate, // Simplified, in a real app this would be a full date
+    releaseDate,
     average_score: dbGame.average_score,
   }
 };
@@ -165,6 +189,7 @@ export const register = async (username: string, email: string, password: string
   };
   
   db.users.push(newUser);
+  saveDb(); // Save changes to localStorage
   console.log('API: Registration successful. New user:', newUser);
   return mapDbUserToBaseUser(newUser);
 };
@@ -184,6 +209,7 @@ export const updateUserProfile = async (updatedData: UserProfile): Promise<UserP
     dbUser.updated_at = new Date().toISOString();
 
     db.users[userIndex] = dbUser;
+    saveDb(); // Save changes to localStorage
     console.log('API: Updating user data to:', dbUser);
     
     // Return the full profile after update
