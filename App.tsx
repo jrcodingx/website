@@ -8,8 +8,9 @@ import NewsPage from './components/NewsPage';
 import ReviewsPage from './components/ReviewsPage';
 import UpcomingPage from './components/UpcomingPage';
 import CommunityPage from './components/CommunityPage';
+import ProfilePage from './components/ProfilePage';
 
-export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community';
+export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'profile';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,6 +24,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setCurrentPage('home'); // Redirect to home on logout
   };
 
   const handleOpenLogin = () => {
@@ -31,6 +33,15 @@ const App: React.FC = () => {
 
   const handleCloseLogin = () => {
     setShowLogin(false);
+  };
+  
+  const navigate = (page: Page) => {
+    // Prevent accessing profile page if not logged in
+    if (page === 'profile' && !isLoggedIn) {
+      setShowLogin(true);
+    } else {
+      setCurrentPage(page);
+    }
   };
 
   useEffect(() => {
@@ -54,6 +65,8 @@ const App: React.FC = () => {
         return <UpcomingPage />;
       case 'community':
         return <CommunityPage />;
+      case 'profile':
+        return <ProfilePage />;
       case 'home':
       default:
         return <HomePage />;
@@ -67,7 +80,7 @@ const App: React.FC = () => {
         onLoginClick={handleOpenLogin} 
         onLogout={handleLogout}
         currentPage={currentPage}
-        onNavigate={setCurrentPage}
+        onNavigate={navigate}
       />
       <main className="flex-grow">
         {renderPage()}

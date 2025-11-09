@@ -26,3 +26,14 @@ export interface Review {
   rating: number; // stars 1-5
   summary: string;
 }
+
+export interface User {
+  username: string;
+  avatarUrl: string;
+  joinDate: string;
+  favoriteGames: GameArticle[];
+  stats: {
+    reviews: number;
+    posts: number;
+  };
+}

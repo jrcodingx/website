@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, cur
                     <UserIcon className="h-6 w-6" />
                  </button>
                  <div className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-                    <a href="#" className="block px-4 py-2 text-sm text-text-secondary hover:bg-gray-700 hover:text-white">Profile</a>
+                    <button onClick={() => onNavigate('profile')} className="block w-full text-left px-4 py-2 text-sm text-text-secondary hover:bg-gray-700 hover:text-white">Profile</button>
                     <a href="#" className="block px-4 py-2 text-sm text-text-secondary hover:bg-gray-700 hover:text-white">Settings</a>
                     <button onClick={onLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300">
                       Logout

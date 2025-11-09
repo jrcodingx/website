@@ -1,5 +1,5 @@
 
-import type { GameArticle, NewsArticle, Review } from './types';
+import type { GameArticle, NewsArticle, Review, User } from './types';
 
 export const MOCK_GAME_ARTICLES: GameArticle[] = [
   {
@@ -141,3 +141,19 @@ export const MOCK_REVIEWS: Review[] = [
     summary: 'Perfectly blends retro charm with modern design. The controls are flawless, and the level design is consistently inventive.',
   }
 ];
+
+export const MOCK_USER: User = {
+  username: 'GamerPro123',
+  avatarUrl: 'https://picsum.photos/seed/avatar/200/200',
+  joinDate: '2023-05-18',
+  favoriteGames: [
+    MOCK_GAME_ARTICLES[0],
+    MOCK_GAME_ARTICLES[2],
+    MOCK_GAME_ARTICLES[6],
+    MOCK_GAME_ARTICLES[3],
+  ],
+  stats: {
+    reviews: 12,
+    posts: 47,
+  }
+};
