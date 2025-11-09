@@ -1,0 +1,260 @@
+// THIS FILE REPRESENTS THE SIMULATED BACKEND SERVER
+// It handles all data logic and persistence.
+
+import type { BaseUser, UserProfile, GameArticle, Review, NewsArticle } from './types';
+
+// --- DATABASE SCHEMA INTERFACES (internal to the server) ---
+// These correspond to your MySQL table structures.
+
+interface DbUser {
+  id: number;
+  username: string;
+  email: string;
+  password_hash: string;
+  avatar_url: string;
+  bio: string;
+  status: 'active' | 'inactive' | 'banned';
+  created_at: string;
+  updated_at: string;
+}
+
+interface DbGame {
+  id: number;
+  title: string;
+  release_year: number;
+  genre: string;
+  description: string;
+  average_score: number;
+  imageUrl: string; // Kept for UI convenience
+}
+
+interface DbReview {
+  id: number;
+  user_id: number;
+  game_id: number;
+  score: number;
+  review_text: string;
+  created_at: string;
+}
+
+interface DbUserFavoriteGame {
+  user_id: number;
+  game_id: number;
+}
+
+
+// --- DATA & STORAGE LOGIC ---
+const DB_STORAGE_KEY = 'gamehub_db';
+
+const initialDb = {
+  users: [
+    {
+      id: 1,
+      username: 'GamerPro123',
+      email: 'gamerpro123@example.com',
+      password_hash: 'password123',
+      avatar_url: 'https://picsum.photos/seed/avatar/200/200',
+      bio: 'A passionate gamer exploring virtual worlds. Co-op and RPG enthusiast. Let\'s play!',
+      status: 'active' as const,
+      created_at: '2023-05-18T10:00:00Z',
+      updated_at: '2023-05-18T10:00:00Z',
+    },
+  ] as DbUser[],
+  games: [
+    { id: 1, title: 'Cybernetic Horizon: A New Era', release_year: 2024, genre: 'RPG', description: 'Explore a vast neon-lit metropolis in this groundbreaking open-world RPG. The future is yours to shape.', average_score: 9.2, imageUrl: 'https://picsum.photos/seed/game1/600/400' },
+    { id: 2, title: 'Project Chimera: Uprising', release_year: 2024, genre: 'FPS', description: 'A tactical FPS that demands strategy and precision. Lead your squad to victory in intense multiplayer battles.', average_score: 8.8, imageUrl: 'https://picsum.photos/seed/game2/600/400' },
+    { id: 3, title: 'Echoes of the Void', release_year: 2024, genre: 'Adventure', description: 'Unravel the mysteries of a lost civilization in this atmospheric puzzle-adventure game. Every shadow holds a secret.', average_score: 8.5, imageUrl: 'https://picsum.photos/seed/game3/600/400' },
+    { id: 4, title: 'Speed Demons IV', release_year: 2025, genre: 'Racing', description: 'The ultimate arcade racing experience is back! Customize your ride and dominate the streets in high-octane races.', average_score: 8.0, imageUrl: 'https://picsum.photos/seed/game4/600/400' },
+    { id: 5, title: 'Realms of Etheria', release_year: 2025, genre: 'MMORPG', description: 'A sprawling fantasy MMORPG with epic quests, massive dungeons, and a dynamic world that evolves with players.', average_score: 0.0, imageUrl: 'https://picsum.photos/seed/game5/600/400' },
+    { id: 6, title: 'Galactic Frontiers', release_year: 2024, genre: 'Strategy', description: 'Build your own space empire in this 4X strategy game. Explore, expand, exploit, and exterminate your way to victory.', average_score: 8.7, imageUrl: 'https://picsum.photos/seed/game6/600/400' },
+    { id: 7, title: 'Pixel Odyssey', release_year: 2024, genre: 'Platformer', description: 'A charming retro-inspired platformer with modern mechanics. Jump, dash, and fight your way through a vibrant pixel world.', average_score: 9.0, imageUrl: 'https://picsum.photos/seed/game7/600/400' },
+    { id: 8, title: 'The Silent Witness', release_year: 2025, genre: 'Narrative', description: 'A detective noir story where your choices matter. Interrogate suspects, find clues, and solve a crime that could shake the city.', average_score: 0.0, imageUrl: 'https://picsum.photos/seed/game8/600/400' },
+  ] as DbGame[],
+  reviews: [
+    { id: 1, user_id: 1, game_id: 1, score: 9.2, review_text: 'A masterpiece of the RPG genre. Its world is breathtakingly immersive, and the storytelling is second to none. A must-play.', created_at: '2024-10-28T10:00:00Z' },
+    { id: 2, user_id: 1, game_id: 3, score: 8.5, review_text: 'A beautifully crafted puzzle game with a haunting atmosphere. While some puzzles are obtuse, the experience is incredibly rewarding.', created_at: '2024-10-05T10:00:00Z' },
+    { id: 3, user_id: 1, game_id: 2, score: 8.8, review_text: 'Offers tight, tactical gunplay that rewards teamwork and strategy. A few balance issues hold it back from perfection.', created_at: '2024-11-20T10:00:00Z' },
+    { id: 4, user_id: 1, game_id: 7, score: 9.0, review_text: 'Perfectly blends retro charm with modern design. The controls are flawless, and the level design is consistently inventive.', created_at: '2024-08-25T10:00:00Z' },
+  ] as DbReview[],
+  user_favorite_games: [
+    { user_id: 1, game_id: 1 },
+    { user_id: 1, game_id: 3 },
+    { user_id: 1, game_id: 7 },
+    { user_id: 1, game_id: 4 },
+  ] as DbUserFavoriteGame[],
+  news: [
+    { id: 1, title: 'Cybernetic Horizon Patch 1.5 Details Revealed', excerpt: 'The developers have announced a massive new content update, including new story chapters, weapons, and a complete overhaul of the cybernetics system.', imageUrl: 'https://picsum.photos/seed/news1/600/400', author: 'Jane Doe', date: '2024-08-15', category: 'Update' as const },
+    { id: 2, title: 'Project Chimera World Championship Announced', excerpt: 'The first official global tournament for Project Chimera kicks off next month with a $1 million prize pool. Qualifiers are open now!', imageUrl: 'https://picsum.photos/seed/news2/600/400', author: 'John Smith', date: '2024-08-12', category: 'Esports' as const },
+    { id: 3, title: 'Indie Darling "Pixel Odyssey" Gets a Surprise Sequel', excerpt: 'The beloved platformer is getting a follow-up, "Pixel Odyssey 2: The Crystal Caverns", slated for a Q2 2025 release.', imageUrl: 'https://picsum.photos/seed/news3/600/400', author: 'Emily White', date: '2024-08-10', category: 'Announcement' as const },
+    { id: 4, title: 'Speed Demons IV: First DLC Cars Leaked', excerpt: 'Images of three new hypercars have surfaced online, hinting at the first major content drop for the popular racing game.', imageUrl: 'https://picsum.photos/seed/news4/600/400', author: 'Chris Green', date: '2024-08-05', category: 'Update' as const },
+  ] as NewsArticle[],
+};
+
+const loadDb = () => {
+  try {
+    const storedDb = localStorage.getItem(DB_STORAGE_KEY);
+    if (storedDb) {
+      return JSON.parse(storedDb);
+    }
+  } catch (error) {
+    console.error('SERVER: Could not parse database from localStorage.', error);
+  }
+  return JSON.parse(JSON.stringify(initialDb)); // Deep copy
+};
+
+const saveDb = () => {
+  try {
+    localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db));
+  } catch (error) {
+    console.error('SERVER: Could not save database to localStorage.', error);
+  }
+};
+
+let db = loadDb();
+
+// --- DATA MAPPING HELPERS (Server prepares data for the client) ---
+
+const mapDbUserToBaseUser = (dbUser: DbUser): BaseUser => ({
+  id: dbUser.id,
+  email: dbUser.email,
+  username: dbUser.username,
+  avatarUrl: dbUser.avatar_url,
+  joinDate: dbUser.created_at,
+  bio: dbUser.bio,
+});
+
+const mapDbGameToGameArticle = (dbGame: DbGame): GameArticle => {
+  let releaseDate = dbGame.release_year.toString();
+  const currentYear = new Date().getFullYear();
+  if (dbGame.release_year > currentYear || (dbGame.release_year === currentYear && new Date().getMonth() < 9)) { // Simple logic for upcoming
+      releaseDate = 'Coming Soon';
+  }
+  
+  return {
+    id: dbGame.id,
+    title: dbGame.title,
+    description: dbGame.description,
+    imageUrl: dbGame.imageUrl,
+    category: dbGame.genre,
+    releaseDate,
+    average_score: dbGame.average_score,
+  }
+};
+
+
+// --- SERVER ENDPOINT HANDLERS ---
+
+export function handleLoginRequest(email: string, password: string): BaseUser {
+  const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+  if (user && user.password_hash === password && user.status === 'active') {
+    console.log('SERVER: Login successful for', email);
+    return mapDbUserToBaseUser(user);
+  } else {
+    console.error('SERVER: Login failed for', email);
+    throw new Error('Invalid email or password.');
+  }
+}
+
+export function handleRegisterRequest(username: string, email: string, password: string): BaseUser {
+  if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+    throw new Error('An account with this email already exists.');
+  }
+  if (db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+    throw new Error('This username is already taken.');
+  }
+
+  const now = new Date().toISOString();
+  const newUser: DbUser = {
+    id: Date.now(),
+    username,
+    email,
+    password_hash: password,
+    avatar_url: `https://picsum.photos/seed/${Date.now()}/200/200`,
+    bio: '',
+    status: 'active',
+    created_at: now,
+    updated_at: now,
+  };
+  
+  db.users.push(newUser);
+  saveDb();
+  console.log('SERVER: Registration successful. New user:', newUser);
+  return mapDbUserToBaseUser(newUser);
+}
+
+export function handleGetUserProfileRequest(userId: number): UserProfile {
+  const user = db.users.find(u => u.id === userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const favoriteGameIds = db.user_favorite_games
+    .filter(fav => fav.user_id === userId)
+    .map(fav => fav.game_id);
+  
+  const favoriteGames = db.games
+    .filter(game => favoriteGameIds.includes(game.id))
+    .map(mapDbGameToGameArticle);
+
+  const reviewsCount = db.reviews.filter(r => r.user_id === userId).length;
+  const postsCount = 47; // Mocked
+
+  return {
+    ...mapDbUserToBaseUser(user),
+    favoriteGames,
+    stats: {
+      reviews: reviewsCount,
+      posts: postsCount,
+    }
+  };
+}
+
+export function handleUpdateUserProfileRequest(updatedData: UserProfile): UserProfile {
+    const userIndex = db.users.findIndex(u => u.id === updatedData.id);
+    if (userIndex === -1) {
+        throw new Error("User not found");
+    }
+    
+    const dbUser = db.users[userIndex];
+    dbUser.username = updatedData.username;
+    dbUser.bio = updatedData.bio || '';
+    dbUser.avatar_url = updatedData.avatarUrl;
+    dbUser.updated_at = new Date().toISOString();
+
+    db.users[userIndex] = dbUser;
+    saveDb();
+    console.log('SERVER: Updating user data to:', dbUser);
+    
+    return handleGetUserProfileRequest(updatedData.id);
+}
+
+export function handleGetGamesRequest(): GameArticle[] {
+  return db.games.map(mapDbGameToGameArticle);
+}
+
+export function handleGetUpcomingGamesRequest(): GameArticle[] {
+  const currentYear = new Date().getFullYear();
+  return db.games
+    .filter(game => game.release_year >= currentYear)
+    .sort((a,b) => a.release_year - b.release_year)
+    .map(mapDbGameToGameArticle);
+}
+
+export function handleGetReviewsRequest(): Review[] {
+  return db.reviews.map(review => {
+    const game = db.games.find(g => g.id === review.game_id);
+    return {
+      id: review.id,
+      gameTitle: game ? game.title : 'Unknown Game',
+      imageUrl: game ? game.imageUrl : 'https://picsum.photos/seed/unknown/600/400',
+      score: review.score,
+      rating: Math.round(review.score / 2),
+      summary: review.review_text,
+    };
+  }).sort((a,b) => b.score - a.score);
+}
+
+export function handleGetNewsRequest(): NewsArticle[] {
+  return [...db.news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
