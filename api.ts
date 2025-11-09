@@ -1,4 +1,3 @@
-
 import type { BaseUser, UserProfile, GameArticle, Review, NewsArticle } from './types';
 
 // --- SIMULATED DATABASE ---
@@ -108,9 +107,12 @@ const mapDbUserToBaseUser = (dbUser: DbUser): BaseUser => ({
 const mapDbGameToGameArticle = (dbGame: DbGame): GameArticle => {
   let releaseDate = dbGame.release_year.toString();
   // Simplified logic for "Coming Soon"
-  const isReleased = new Date(`${dbGame.release_year}-01-02`) < new Date();
+  const isReleased = new Date().getFullYear() > dbGame.release_year;
   if (!isReleased && dbGame.average_score === 0.0) {
-    releaseDate = 'Coming Soon';
+     const isThisYear = new Date().getFullYear() === dbGame.release_year;
+     if (!isThisYear) {
+        releaseDate = 'Coming Soon';
+     }
   }
   
   return {
@@ -155,7 +157,7 @@ export const register = async (username: string, email: string, password: string
     username,
     email,
     password_hash: password,
-    avatar_url: `https://i.pravatar.cc/150?u=${Date.now()}`,
+    avatar_url: `https://picsum.photos/seed/${Date.now()}/200/200`,
     bio: '',
     status: 'active',
     created_at: now,
@@ -226,12 +228,9 @@ export const getGames = async (): Promise<GameArticle[]> => {
 
 export const getUpcomingGames = async (): Promise<GameArticle[]> => {
   await networkDelay(500);
-  const today = new Date();
+  const currentYear = new Date().getFullYear();
   return db.games
-    .filter(game => {
-       const releaseDate = new Date(`${game.release_year}-01-02`);
-       return releaseDate > today;
-    })
+    .filter(game => game.release_year > currentYear)
     .map(mapDbGameToGameArticle);
 };
 
@@ -253,5 +252,5 @@ export const getReviews = async (): Promise<Review[]> => {
 
 export const getNews = async (): Promise<NewsArticle[]> => {
   await networkDelay(500);
-  return db.news;
+  return [...db.news].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
