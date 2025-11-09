@@ -9,10 +9,11 @@ import ReviewsPage from './components/ReviewsPage';
 import UpcomingPage from './components/UpcomingPage';
 import CommunityPage from './components/CommunityPage';
 import ProfilePage from './components/ProfilePage';
+import RecommendationPage from './components/RecommendationPage';
 import type { User } from './types';
 import * as api from './api';
 
-export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'profile';
+export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'recommendation' | 'profile';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -81,6 +82,8 @@ const App: React.FC = () => {
         return <UpcomingPage />;
       case 'community':
         return <CommunityPage />;
+      case 'recommendation':
+        return <RecommendationPage />;
       case 'profile':
         return user ? <ProfilePage user={user} onUpdateUser={handleUpdateUser} /> : null;
       case 'home':

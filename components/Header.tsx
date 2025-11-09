@@ -1,6 +1,7 @@
 
 import React from 'react';
 import UserIcon from './icons/UserIcon';
+import SparklesIcon from './icons/SparklesIcon';
 import type { Page } from '../App';
 
 interface HeaderProps {
@@ -17,14 +18,20 @@ const NavLink: React.FC<{
   currentPage: Page;
   onNavigate: (page: Page) => void;
   children: React.ReactNode;
-}> = ({ page, currentPage, onNavigate, children }) => {
+  isSpecial?: boolean;
+}> = ({ page, currentPage, onNavigate, children, isSpecial = false }) => {
   const isActive = currentPage === page;
+  
+  const baseClasses = 'transition-colors duration-200 flex items-center space-x-2';
+  const activeClasses = 'text-white font-semibold';
+  const inactiveClasses = 'text-text-secondary hover:text-white';
+  const specialClasses = isSpecial ? 'px-3 py-1 rounded-full bg-primary/20 hover:bg-primary/40' : '';
+  const specialActiveClasses = isSpecial ? '!text-primary font-bold' : '';
+
   return (
     <button
       onClick={() => onNavigate(page)}
-      className={`transition-colors duration-200 ${
-        isActive ? 'text-white font-semibold' : 'text-text-secondary hover:text-white'
-      }`}
+      className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses} ${specialClasses} ${isActive && isSpecial ? specialActiveClasses : ''}`}
     >
       {children}
     </button>
@@ -41,11 +48,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, cur
               <span className="text-primary">GAME</span>HUB
             </button>
           </div>
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             <NavLink page="news" currentPage={currentPage} onNavigate={onNavigate}>News</NavLink>
             <NavLink page="reviews" currentPage={currentPage} onNavigate={onNavigate}>Reviews</NavLink>
             <NavLink page="upcoming" currentPage={currentPage} onNavigate={onNavigate}>Upcoming</NavLink>
             <NavLink page="community" currentPage={currentPage} onNavigate={onNavigate}>Community</NavLink>
+            <NavLink page="recommendation" currentPage={currentPage} onNavigate={onNavigate} isSpecial>
+                <SparklesIcon className="w-4 h-4" />
+                <span>Recommendations</span>
+            </NavLink>
           </nav>
           <div className="flex items-center">
             {isLoggedIn ? (

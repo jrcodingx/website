@@ -40,3 +40,9 @@ export interface User {
     posts: number;
   };
 }
+
+export interface Recommendation {
+  title: string;
+  description: string;
+  genre: string;
+}
