@@ -1,9 +1,19 @@
-
 // THIS FILE REPRESENTS THE FRONTEND'S API CLIENT
 // It acts as a bridge between the UI components and the simulated backend server.
 
 import type { BaseUser, UserProfile, GameArticle, Review, NewsArticle } from './types';
-import * as server from './server';
+import {
+  handleLoginRequest,
+  handleRegisterRequest,
+  handleUpdateUserProfileRequest,
+  handleGetUserProfileRequest,
+  handleGetGamesRequest,
+  handleGetUpcomingGamesRequest,
+  handleGetReviewsRequest,
+  handleGetNewsRequest,
+  handleAddFavoriteRequest,
+  handleRemoveFavoriteRequest
+} from './server';
 
 // --- HELPER FUNCTIONS ---
 
@@ -18,51 +28,51 @@ export const login = async (email: string, password: string): Promise<BaseUser> 
   // const data = await response.json();
   // if (!response.ok) throw new Error(data.message);
   // return data;
-  return server.handleLoginRequest(email, password);
+  return handleLoginRequest(email, password);
 };
 
 export const register = async (username: string, email: string, password: string): Promise<BaseUser> => {
   await networkDelay(800);
-  return server.handleRegisterRequest(username, email, password);
+  return handleRegisterRequest(username, email, password);
 };
 
 
 export const updateUserProfile = async (updatedData: UserProfile): Promise<UserProfile> => {
     await networkDelay(800);
-    return server.handleUpdateUserProfileRequest(updatedData);
+    return handleUpdateUserProfileRequest(updatedData);
 };
 
 export const getUserProfile = async (userId: number): Promise<UserProfile> => {
   await networkDelay(400);
-  return server.handleGetUserProfileRequest(userId);
+  return handleGetUserProfileRequest(userId);
 };
 
 export const getGames = async (): Promise<GameArticle[]> => {
   await networkDelay(500);
-  return server.handleGetGamesRequest();
+  return handleGetGamesRequest();
 };
 
 export const getUpcomingGames = async (): Promise<GameArticle[]> => {
   await networkDelay(500);
-  return server.handleGetUpcomingGamesRequest();
+  return handleGetUpcomingGamesRequest();
 };
 
 export const getReviews = async (): Promise<Review[]> => {
   await networkDelay(500);
-  return server.handleGetReviewsRequest();
+  return handleGetReviewsRequest();
 };
 
 export const getNews = async (): Promise<NewsArticle[]> => {
   await networkDelay(500);
-  return server.handleGetNewsRequest();
+  return handleGetNewsRequest();
 };
 
 export const addFavorite = async (userId: number, gameId: number): Promise<UserProfile> => {
     await networkDelay(300);
-    return server.handleAddFavoriteRequest(userId, gameId);
+    return handleAddFavoriteRequest(userId, gameId);
 };
 
 export const removeFavorite = async (userId: number, gameId: number): Promise<UserProfile> => {
     await networkDelay(300);
-    return server.handleRemoveFavoriteRequest(userId, gameId);
+    return handleRemoveFavoriteRequest(userId, gameId);
 };
