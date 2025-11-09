@@ -31,6 +31,7 @@ export interface User {
   username: string;
   avatarUrl: string;
   joinDate: string;
+  bio?: string;
   favoriteGames: GameArticle[];
   stats: {
     reviews: number;

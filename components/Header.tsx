@@ -9,6 +9,7 @@ interface HeaderProps {
   onLogout: () => void;
   currentPage: Page;
   onNavigate: (page: Page) => void;
+  username: string;
 }
 
 const NavLink: React.FC<{
@@ -30,7 +31,7 @@ const NavLink: React.FC<{
   );
 };
 
-const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, currentPage, onNavigate }) => {
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, currentPage, onNavigate, username }) => {
   return (
     <header className="bg-surface/80 backdrop-blur-sm sticky top-0 z-50 shadow-lg shadow-black/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,8 +50,9 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, onLoginClick, onLogout, cur
           <div className="flex items-center">
             {isLoggedIn ? (
               <div className="relative group">
-                 <button className="flex items-center space-x-2 text-white bg-primary/20 hover:bg-primary/40 rounded-full p-2 transition-colors duration-300">
-                    <UserIcon className="h-6 w-6" />
+                 <button className="flex items-center space-x-3 text-white bg-surface hover:bg-gray-700/80 rounded-full p-1 pr-4 transition-colors duration-300">
+                    <UserIcon className="h-8 w-8 bg-primary/20 rounded-full p-1" />
+                    <span className="font-semibold text-sm">{username}</span>
                  </button>
                  {/* The outer div now has padding to bridge the gap */}
                  <div className="absolute right-0 w-48 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">

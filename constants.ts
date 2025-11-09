@@ -146,6 +146,7 @@ export const MOCK_USER: User = {
   username: 'GamerPro123',
   avatarUrl: 'https://picsum.photos/seed/avatar/200/200',
   joinDate: '2023-05-18',
+  bio: 'A passionate gamer exploring virtual worlds. Co-op and RPG enthusiast. Let\'s play!',
   favoriteGames: [
     MOCK_GAME_ARTICLES[0],
     MOCK_GAME_ARTICLES[2],

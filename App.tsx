@@ -9,6 +9,8 @@ import ReviewsPage from './components/ReviewsPage';
 import UpcomingPage from './components/UpcomingPage';
 import CommunityPage from './components/CommunityPage';
 import ProfilePage from './components/ProfilePage';
+import type { User } from './types';
+import { MOCK_USER } from './constants';
 
 export type Page = 'home' | 'news' | 'reviews' | 'upcoming' | 'community' | 'profile';
 
@@ -16,6 +18,7 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [user, setUser] = useState<User>(MOCK_USER);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -25,6 +28,10 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentPage('home'); // Redirect to home on logout
+  };
+  
+  const handleUpdateUser = (updatedUser: User) => {
+    setUser(updatedUser);
   };
 
   const handleOpenLogin = () => {
@@ -66,7 +73,7 @@ const App: React.FC = () => {
       case 'community':
         return <CommunityPage />;
       case 'profile':
-        return <ProfilePage />;
+        return <ProfilePage user={user} onUpdateUser={handleUpdateUser} />;
       case 'home':
       default:
         return <HomePage />;
@@ -81,6 +88,7 @@ const App: React.FC = () => {
         onLogout={handleLogout}
         currentPage={currentPage}
         onNavigate={navigate}
+        username={user.username}
       />
       <main className="flex-grow">
         {renderPage()}
